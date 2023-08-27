@@ -1,0 +1,8 @@
+yolov5x6u.pt
+dataset/archive/real life violence situations/*
+dataset/archive/Real Life Violence Dataset/*
+*.avi
+*.mp4
+Real Life Violence Dataset/*
+real life violence situations/*
+features.npy
