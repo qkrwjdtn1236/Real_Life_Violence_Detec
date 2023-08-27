@@ -167,58 +167,6 @@ def create_model():
     model.summary()
     
     return model
-ssl._create_default_https_context = ssl._create_unverified_context
-plt.style.use("seaborn")
-
-device = torch.device('mps:0' if torch.backends.mps.is_available() else 'cpu')
-# Classes Directories
-NonViolnceVideos_Dir = "Real Life Violence Dataset/NonViolence"
-ViolnceVideos_Dir = "Real Life Violence Dataset/Violence"
-
-# Retrieve the list of all the video files present in the Class Directory.
-NonViolence_files_names_list = os.listdir(NonViolnceVideos_Dir)
-Violence_files_names_list = os.listdir(ViolnceVideos_Dir)
-
-# Randomly select a video file from the Classes Directory.
-Random_NonViolence_Video = random.choice(NonViolence_files_names_list)
-Random_Violence_Video = random.choice(Violence_files_names_list)
-
-Play_Video(f"{NonViolnceVideos_Dir}/{Random_NonViolence_Video}")
-
-Play_Video(f"{ViolnceVideos_Dir}/{Random_Violence_Video}")
-
-# Specify the height and width to which each video frame will be resized in our dataset.
-
-
-# Create the dataset.
-features, labels, video_files_paths = create_dataset()
-
-# Saving the extracted data
-np.save("features.npy",features)
-np.save("labels.npy",labels)
-np.save("video_files_paths.npy",video_files_paths)
-
-features, labels, video_files_paths = np.load("features.npy") , np.load("labels.npy") ,  np.load("video_files_paths.npy")
-
-# convert labels into one-hot-encoded vectors
-one_hot_encoded_labels = to_categorical(labels)
-
-# Split the Data into Train ( 90% ) and Test Set ( 10% ).
-features_train, features_test, labels_train, labels_test = train_test_split(features, one_hot_encoded_labels, test_size = 0.1, shuffle = True, random_state = 42)
-
-print(features_train.shape,labels_train.shape)
-print(features_test.shape, labels_test.shape)
-
-from keras.applications.mobilenet_v2 import MobileNetV2
-
-mobilenet = MobileNetV2( include_top=False , weights="imagenet")
-
-#Fine-Tuning to make the last 40 layer trainable
-mobilenet.trainable=True
-
-for layer in mobilenet.layers[:-40]:
-  layer.trainable=False
-
 
 def plot_metric(model_training_history, metric_name_1, metric_name_2, plot_name):
     
@@ -389,6 +337,62 @@ def predict_video(video_file_path, SEQUENCE_LENGTH):
 
 if __name__ == "__main__":
     # Constructing the Model
+
+
+    ssl._create_default_https_context = ssl._create_unverified_context
+    plt.style.use("seaborn")
+
+    device = torch.device('mps:0' if torch.backends.mps.is_available() else 'cpu')
+    # Classes Directories
+    NonViolnceVideos_Dir = "Real Life Violence Dataset/NonViolence"
+    ViolnceVideos_Dir = "Real Life Violence Dataset/Violence"
+
+    # Retrieve the list of all the video files present in the Class Directory.
+    NonViolence_files_names_list = os.listdir(NonViolnceVideos_Dir)
+    Violence_files_names_list = os.listdir(ViolnceVideos_Dir)
+
+    # Randomly select a video file from the Classes Directory.
+    Random_NonViolence_Video = random.choice(NonViolence_files_names_list)
+    Random_Violence_Video = random.choice(Violence_files_names_list)
+
+    Play_Video(f"{NonViolnceVideos_Dir}/{Random_NonViolence_Video}")
+
+    Play_Video(f"{ViolnceVideos_Dir}/{Random_Violence_Video}")
+
+    # Specify the height and width to which each video frame will be resized in our dataset.
+
+
+    # Create the dataset.
+    features, labels, video_files_paths = create_dataset()
+
+    # Saving the extracted data
+    np.save("features.npy",features)
+    np.save("labels.npy",labels)
+    np.save("video_files_paths.npy",video_files_paths)
+
+    features, labels, video_files_paths = np.load("features.npy") , np.load("labels.npy") ,  np.load("video_files_paths.npy")
+
+    # convert labels into one-hot-encoded vectors
+    one_hot_encoded_labels = to_categorical(labels)
+
+    # Split the Data into Train ( 90% ) and Test Set ( 10% ).
+    features_train, features_test, labels_train, labels_test = train_test_split(features, one_hot_encoded_labels, test_size = 0.1, shuffle = True, random_state = 42)
+
+    print(features_train.shape,labels_train.shape)
+    print(features_test.shape, labels_test.shape)
+
+    from keras.applications.mobilenet_v2 import MobileNetV2
+
+    mobilenet = MobileNetV2( include_top=False , weights="imagenet")
+
+    #Fine-Tuning to make the last 40 layer trainable
+    mobilenet.trainable=True
+
+    for layer in mobilenet.layers[:-40]:
+        layer.trainable=False
+
+
+
     MoBiLSTM_model = create_model()
 
     # Plot the structure of the contructed LRCN model.
